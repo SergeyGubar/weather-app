@@ -9,6 +9,8 @@ import com.example.sergey.weatherapp.R
 /**
  * Created by Sergey on 9/12/2017.
  */
+//TODO: Implement adapter for recycler view
+/*
 class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder> {
     override fun onBindViewHolder(holder: WeatherViewHolder?, position: Int) {
 
@@ -21,7 +23,6 @@ class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder> {
     }
 
     class WeatherViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-
     }
 
-}
+}*/
