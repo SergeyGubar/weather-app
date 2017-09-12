@@ -11,6 +11,7 @@ import com.example.sergey.weatherapp.R
  */
 class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder> {
     override fun onBindViewHolder(holder: WeatherViewHolder?, position: Int) {
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): WeatherViewHolder {
