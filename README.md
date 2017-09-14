@@ -1,2 +1,2 @@
 # Weather App
-Works with http://openweathermap.org/current and geolocation
+Works with https://darksky.net/dev/account and geolocation
