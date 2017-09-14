@@ -3,21 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:weightSum="4"
     android:orientation="vertical">
-
-    <fragment
-        android:name="com.example.sergey.weatherapp.fragments.WeatherFragment"
+    <FrameLayout
         android:id="@+id/main_weather_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:padding="@dimen/padding_16_dp"
-        tools:layout="@layout/main_weather_fragment" />
-
+        android:layout_weight="1"
+        />
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/words_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3" />
-
+        android:layout_weight="3"
+        />
 </LinearLayout>
