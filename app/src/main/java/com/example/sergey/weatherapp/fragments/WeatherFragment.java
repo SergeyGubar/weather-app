@@ -25,6 +25,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.example.sergey.weatherapp.main.MainActivity.LATITUDE_KEY;
+import static com.example.sergey.weatherapp.main.MainActivity.LONGITUDE_KEY;
+
 
 /**
  * Created by Sergey on 9/12/2017.
@@ -42,13 +45,19 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         boolean isAttachedToParent = false;
+
         View inflatedView = inflater.inflate(R.layout.main_weather_fragment, null, isAttachedToParent);
+        Bundle args = getArguments();
+
+        double latitude = args.getDouble(LATITUDE_KEY);
+        double longitude = args.getDouble(LONGITUDE_KEY);
         mTemperatureTextView = (TextView) inflatedView.findViewById(R.id.degrees_text_view);
         mCityTextView = (TextView) inflatedView.findViewById(R.id.city_text_view);
         mSummaryTextView = (TextView) inflatedView.findViewById(R.id.weather_description_text_view);
         mWeatherImageView = (ImageView) inflatedView.findViewById(R.id.weather_image_view);
-        new WeatherTask().execute("https://api.darksky.net/forecast/5b0ccf2ae41ee32686d2ae27eff06011/" +
-                "49.96535591,36.2878418?exclude=hourly,minutely/");
+
+        new WeatherTask().execute(WeatherTask.MAIN_URI + WeatherTask.KEY +
+                latitude + "," + longitude + WeatherTask.PARAMETERS);
         return inflatedView;
     }
 
@@ -62,6 +71,10 @@ public class WeatherFragment extends Fragment {
     public class WeatherTask extends AsyncTask<String, Void, String> {
         private OkHttpClient mClient;
         private final String TAG = WeatherTask.class.getSimpleName();
+        public static final String MAIN_URI = "https://api.darksky.net/forecast/";
+        public static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
+        public static final String PARAMETERS = "?exclude=hourly,minutely/";
+
         @Override
         protected String doInBackground(String... params) {
             String queryUrl = params[0];
@@ -113,7 +126,7 @@ public class WeatherFragment extends Fragment {
                 }
 
             } else {
-                Log.d(TAG, "ATTENTION SOMETHING WENT WRONG VERY WRONG!!");
+                Log.d(TAG, "Result is empty or null");
             }
         }
     }
