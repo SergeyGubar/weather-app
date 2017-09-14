@@ -11,14 +11,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.sergey.weatherapp.R;
+import com.example.sergey.weatherapp.entities.Weather;
+import com.example.sergey.weatherapp.utilities.WeatherUtilites;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
+import static com.example.sergey.weatherapp.utilities.WeatherUtilites.fahrenheitToCelcius;
 
 /**
  * Created by Sergey on 9/12/2017.
@@ -28,7 +36,7 @@ public class WeatherFragment extends Fragment {
 
     private TextView mTemperatureTextView;
     private OkHttpClient mClient;
-    private static final String TAG  = "WeatherFragment";
+    private static final String TAG = "WeatherFragment";
 
     @Nullable
     @Override
@@ -63,10 +71,36 @@ public class WeatherFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            if(result != null && !result.isEmpty()) {
-                Log.d(TAG, result);
+            if (result != null && !result.isEmpty()) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    JSONObject currentWeather = jsonObject.getJSONObject("currently");
+
+                    String parsedDate = currentWeather.getString("time");
+                    String parsedSummary = currentWeather.getString("summary");
+                    String parsedCelciusTemp = currentWeather.getString("temperature");
+                    String parsedHumidity = currentWeather.getString("humidity");
+                    String parsedPressure = currentWeather.getString("pressure");
+
+                    long milliSeconds = Long.valueOf(parsedDate) * 1000;
+                    Date date = new Date(milliSeconds);
+
+                    int temp = WeatherUtilites.fahrenheitToCelcius(Double.valueOf(parsedCelciusTemp));
+
+                    double humidity = Double.valueOf(parsedHumidity);
+
+                    double pressure = Double.valueOf(parsedPressure);
+
+                    Weather weather = new Weather(date, parsedSummary, temp, humidity, pressure);
+                    Log.d(TAG, weather.toString());
+
+                } catch (JSONException e) {
+                    Log.e(TAG, "Json parsing failed");
+                    e.printStackTrace();
+                }
+
             } else {
-                Log.d(TAG, "ATTENTION SOMETHIN WENT WRONG VERY WRONG!!");
+                Log.d(TAG, "ATTENTION SOMETHING WENT WRONG VERY WRONG!!");
             }
         }
     }
