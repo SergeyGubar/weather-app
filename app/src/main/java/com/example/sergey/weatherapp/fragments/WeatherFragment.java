@@ -64,6 +64,31 @@ public class WeatherFragment extends Fragment {
     private void setWeather(Weather weather) {
         mTemperatureTextView.setText(weather.getTemperature() + "°C");
         mSummaryTextView.setText(weather.getSummary());
+        switch (weather.getIcon()) {
+            case "clear-day":
+                mWeatherImageView.setImageResource(R.drawable.ic_clear_day);
+                break;
+            case "clear-night":
+                mWeatherImageView.setImageResource(R.drawable.ic_clear_night);
+                break;
+            case "rain":
+                mWeatherImageView.setImageResource(R.drawable.ic_rain);
+                break;
+            case "snow":
+                mWeatherImageView.setImageResource(R.drawable.ic_snow);
+                break;
+            case "sleet":
+                mWeatherImageView.setImageResource(R.drawable.ic_rain);
+                break;
+            case "wind":
+                mWeatherImageView.setImageResource(R.drawable.ic_wind);
+                break;
+            case "fog":
+                mWeatherImageView.setImageResource(R.drawable.ic_fog);
+                break;
+            default:
+                mWeatherImageView.setImageResource(R.drawable.ic_cloud);
+        }
         mCityTextView.setText("Kharkiv");
     }
 
@@ -105,7 +130,7 @@ public class WeatherFragment extends Fragment {
                     String parsedTemp = currentWeather.getString("temperature");
                     String parsedHumidity = currentWeather.getString("humidity");
                     String parsedPressure = currentWeather.getString("pressure");
-
+                    String parsedIconType = currentWeather.getString("icon");
                     long milliSeconds = Long.valueOf(parsedDate) * 1000;
                     Date date = new Date(milliSeconds);
 
@@ -115,7 +140,7 @@ public class WeatherFragment extends Fragment {
 
                     double pressure = Double.valueOf(parsedPressure);
 
-                    Weather weather = new Weather(date, parsedSummary, temp, humidity, pressure);
+                    Weather weather = new Weather(date, parsedSummary, temp, humidity, pressure, parsedIconType);
                     Log.d(TAG, weather.toString());
 
                     setWeather(weather);
