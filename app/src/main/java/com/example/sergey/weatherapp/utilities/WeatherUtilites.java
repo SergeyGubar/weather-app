@@ -1,7 +1,5 @@
 package com.example.sergey.weatherapp.utilities;
 
-import com.example.sergey.weatherapp.entities.Weather;
-
 /**
  * Created by Sergey on 9/14/2017.
  */
