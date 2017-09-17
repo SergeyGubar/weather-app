@@ -20,10 +20,10 @@ public class DailyWeather extends Weather {
     }
 
     public String getMaxTemperature() {
-        return maxTemperature + "°C";
+        return maxTemperature + "°C ";
     }
 
     public String getMinTemperature() {
-        return minTemperature + "°C";
+        return minTemperature + "°C ";
     }
 }

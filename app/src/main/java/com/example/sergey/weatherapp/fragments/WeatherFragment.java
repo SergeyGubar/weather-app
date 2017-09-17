@@ -43,7 +43,6 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         boolean isAttachedToParent = false;
-
         View inflatedView = inflater.inflate(R.layout.main_weather_fragment, null, isAttachedToParent);
 
         Bundle args = getArguments();
@@ -55,46 +54,23 @@ public class WeatherFragment extends Fragment {
         mSummaryTextView = (TextView) inflatedView.findViewById(R.id.weather_description_text_view);
         mWeatherImageView = (ImageView) inflatedView.findViewById(R.id.weather_image_view);
 
-        new WeatherTask().execute(WeatherTask.MAIN_URI + WeatherTask.KEY +
-                latitude + "," + longitude + WeatherTask.PARAMETERS);
+        new CurrentWeatherTask().execute(CurrentWeatherTask.MAIN_URI + CurrentWeatherTask.KEY +
+                latitude + "," + longitude + CurrentWeatherTask.PARAMETERS);
         return inflatedView;
     }
 
     private void setWeather(CurrentWeather weather) {
         mTemperatureTextView.setText(weather.getTemperature());
         mSummaryTextView.setText(weather.getSummary());
-        switch (weather.getIcon()) {
-            case "clear-day":
-                mWeatherImageView.setImageResource(R.drawable.ic_clear_day);
-                break;
-            case "clear-night":
-                mWeatherImageView.setImageResource(R.drawable.ic_clear_night);
-                break;
-            case "rain":
-                mWeatherImageView.setImageResource(R.drawable.ic_rain);
-                break;
-            case "snow":
-                mWeatherImageView.setImageResource(R.drawable.ic_snow);
-                break;
-            case "sleet":
-                mWeatherImageView.setImageResource(R.drawable.ic_rain);
-                break;
-            case "wind":
-                mWeatherImageView.setImageResource(R.drawable.ic_wind);
-                break;
-            case "fog":
-                mWeatherImageView.setImageResource(R.drawable.ic_fog);
-                break;
-            default:
-                mWeatherImageView.setImageResource(R.drawable.ic_cloud);
-        }
+        int icon = WeatherUtilites.getWeatherIcon(weather.getIcon());
+        mWeatherImageView.setImageResource(icon);
         mCityTextView.setText("Kharkiv");
     }
 
 
-    public class WeatherTask extends AsyncTask<String, Void, String> {
+    public class CurrentWeatherTask extends AsyncTask<String, Void, String> {
         private OkHttpClient mClient;
-        private final String TAG = WeatherTask.class.getSimpleName();
+        private final String TAG = CurrentWeatherTask.class.getSimpleName();
         public static final String MAIN_URI = "https://api.darksky.net/forecast/";
         public static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
         public static final String PARAMETERS = "?exclude=hourly,minutely/";
@@ -121,7 +97,7 @@ public class WeatherFragment extends Fragment {
         protected void onPostExecute(String result) {
             if (result != null && !result.isEmpty()) {
                 try {
-                    CurrentWeather weather = WeatherUtilites.getWeatherFromJson(result);
+                    CurrentWeather weather = WeatherUtilites.getCurrentWeather(result);
                     setWeather(weather);
                 } catch (JSONException e) {
                     Log.e(TAG, "Json parsing failed");
