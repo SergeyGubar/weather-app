@@ -5,7 +5,8 @@ import java.util.*
 /**
  * Created by Sergey on 9/12/2017.
  */
-data class Weather(val time: Date, val summary: String,  private val _temperature : Int,
-                   val humidity: Double, val pressure: Double, val icon : String) {
-    val temperature : String get() = _temperature.toString() + "°C"
+class CurrentWeather(time: Date, summary: String, _temperature : Int,
+                          humidity: Double,  pressure: Double,  icon : String) : Weather(time, summary,
+        icon, _temperature, humidity, pressure) {
+    val temperature : String get() = getTemperature().toString() + "°C"
 }
