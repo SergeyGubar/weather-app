@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     LOCATION_PERMISSION);
-
         } else {
             inflateFragment();
         }
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     public void inflateFragment() {
         final WeatherFragment mainFragment = new WeatherFragment();
         final Bundle args = new Bundle();
-
         try {
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override

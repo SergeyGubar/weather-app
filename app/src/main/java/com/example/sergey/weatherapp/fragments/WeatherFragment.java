@@ -12,14 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sergey.weatherapp.R;
-import com.example.sergey.weatherapp.entities.Weather;
+import com.example.sergey.weatherapp.entities.CurrentWeather;
 import com.example.sergey.weatherapp.utilities.WeatherUtilites;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Date;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,10 +45,11 @@ public class WeatherFragment extends Fragment {
         boolean isAttachedToParent = false;
 
         View inflatedView = inflater.inflate(R.layout.main_weather_fragment, null, isAttachedToParent);
-        Bundle args = getArguments();
 
+        Bundle args = getArguments();
         double latitude = args.getDouble(LATITUDE_KEY);
         double longitude = args.getDouble(LONGITUDE_KEY);
+
         mTemperatureTextView = (TextView) inflatedView.findViewById(R.id.degrees_text_view);
         mCityTextView = (TextView) inflatedView.findViewById(R.id.city_text_view);
         mSummaryTextView = (TextView) inflatedView.findViewById(R.id.weather_description_text_view);
@@ -61,8 +60,8 @@ public class WeatherFragment extends Fragment {
         return inflatedView;
     }
 
-    private void setWeather(Weather weather) {
-        mTemperatureTextView.setText(weather.getTemperature() + "°C");
+    private void setWeather(CurrentWeather weather) {
+        mTemperatureTextView.setText(weather.getTemperature());
         mSummaryTextView.setText(weather.getSummary());
         switch (weather.getIcon()) {
             case "clear-day":
@@ -122,36 +121,14 @@ public class WeatherFragment extends Fragment {
         protected void onPostExecute(String result) {
             if (result != null && !result.isEmpty()) {
                 try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    JSONObject currentWeather = jsonObject.getJSONObject("currently");
-
-                    String parsedDate = currentWeather.getString("time");
-                    String parsedSummary = currentWeather.getString("summary");
-                    String parsedTemp = currentWeather.getString("temperature");
-                    String parsedHumidity = currentWeather.getString("humidity");
-                    String parsedPressure = currentWeather.getString("pressure");
-                    String parsedIconType = currentWeather.getString("icon");
-                    long milliSeconds = Long.valueOf(parsedDate) * 1000;
-                    Date date = new Date(milliSeconds);
-
-                    int temp = WeatherUtilites.fahrenheitToCelcius(Double.valueOf(parsedTemp));
-
-                    double humidity = Double.valueOf(parsedHumidity);
-
-                    double pressure = Double.valueOf(parsedPressure);
-
-                    Weather weather = new Weather(date, parsedSummary, temp, humidity, pressure, parsedIconType);
-                    Log.d(TAG, weather.toString());
-
+                    CurrentWeather weather = WeatherUtilites.getWeatherFromJson(result);
                     setWeather(weather);
-
                 } catch (JSONException e) {
                     Log.e(TAG, "Json parsing failed");
                     e.printStackTrace();
                 }
-
             } else {
-                Log.d(TAG, "Result is empty or null");
+                Log.e(TAG, "Result is empty or null");
             }
         }
     }
