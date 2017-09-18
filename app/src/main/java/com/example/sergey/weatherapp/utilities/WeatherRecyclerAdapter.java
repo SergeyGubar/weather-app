@@ -68,7 +68,7 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherRecycler
 
         public void setWeatherData(DailyWeather weather) {
             String summary = weather.getSummary();
-            String temperature = weather.getMinTemperature() + weather.getMaxTemperature();
+            String temperature = weather.getMinTemperature() + " - " + weather.getMaxTemperature() + "°C" ;
             String icon = weather.getIcon();
             mSummary.setText(summary);
             mTemperature.setText(temperature);

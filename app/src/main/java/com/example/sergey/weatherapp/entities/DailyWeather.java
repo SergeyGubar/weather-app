@@ -15,15 +15,15 @@ public class DailyWeather extends Weather {
     public DailyWeather(Date time, String summary, String icon, int temperature, double humidity,
                         double pressure, int maxTemp, int minTemp) {
         super(time, summary, icon, temperature, humidity, pressure);
-        maxTemperature = String.valueOf(WeatherUtilites.fahrenheitToCelcius(maxTemp));
-        minTemperature = String.valueOf(WeatherUtilites.fahrenheitToCelcius(minTemp));
+        maxTemperature = String.valueOf(maxTemp);
+        minTemperature = String.valueOf(minTemp);
     }
 
     public String getMaxTemperature() {
-        return maxTemperature + "°C ";
+        return maxTemperature + " ";
     }
 
     public String getMinTemperature() {
-        return minTemperature + "°C ";
+        return minTemperature + " ";
     }
 }

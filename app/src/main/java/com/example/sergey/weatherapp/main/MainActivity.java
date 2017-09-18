@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         } else {
             inflateFragment();
         }
-        new DailyWeatherTask().execute(DailyWeatherTask.MAIN_URI + DailyWeatherTask.KEY +
-                mLatitude + "," + mLongitude + DailyWeatherTask.PARAMETERS);
     }
 
     public void inflateFragment() {
@@ -79,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                 public void onSuccess(Location location) {
                     mLongitude = location.getLongitude();
                     mLatitude = location.getLatitude();
+                    String request = DailyWeatherTask.MAIN_URI + DailyWeatherTask.KEY +
+                            mLatitude + "," + mLongitude + DailyWeatherTask.PARAMETERS;
+                    new DailyWeatherTask().execute(request);
                     args.putDouble(LATITUDE_KEY, mLatitude);
                     args.putDouble(LONGITUDE_KEY, mLongitude);
                     mainFragment.setArguments(args);
