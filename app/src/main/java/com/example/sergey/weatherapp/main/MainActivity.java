@@ -16,15 +16,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.sergey.weatherapp.R;
-import com.example.sergey.weatherapp.entities.CurrentWeather;
 import com.example.sergey.weatherapp.entities.DailyWeather;
-import com.example.sergey.weatherapp.entities.Weather;
 import com.example.sergey.weatherapp.fragments.WeatherFragment;
 import com.example.sergey.weatherapp.utilities.WeatherRecyclerAdapter;
 import com.example.sergey.weatherapp.utilities.WeatherUtilites;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 
@@ -42,14 +39,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     private static final int LOCATION_PERMISSION = 123;
     public static final String LATITUDE_KEY = "latitude";
     public static final String LONGITUDE_KEY = "longtitude";
+    public static final String WEATHER_KEY = "weather";
     private FusedLocationProviderClient mFusedLocationClient;
-    private LocationManager locationManager;
+    private LocationManager mLocationManager;
     private WeatherRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    //FIXME : THAT'S BAD VERY BAD
     private double mLongitude;
     private double mLatitude;
-    boolean locationReceived;
 
 
     @Override
@@ -63,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         mAdapter = new WeatherRecyclerAdapter(this);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mAdapter);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -80,28 +76,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     }
 
     public void inflateFragment() {
-        final WeatherFragment mainFragment = new WeatherFragment();
-        final Bundle args = new Bundle();
         try {
             final LocationListener listener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    if (!locationReceived) {
-                        mLongitude = location.getLongitude();
-                        mLatitude = location.getLatitude();
-                        String request = DailyWeatherTask.MAIN_URI + DailyWeatherTask.KEY +
-                                mLatitude + "," + mLongitude + DailyWeatherTask.PARAMETERS;
-                        new DailyWeatherTask().execute(request);
-                        args.putDouble(LATITUDE_KEY, mLatitude);
-                        args.putDouble(LONGITUDE_KEY, mLongitude);
-                        mainFragment.setArguments(args);
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.main_weather_container, mainFragment)
-                                .commit();
-                        locationReceived = true;
-                        locationManager.removeUpdates(this);
-                    }
+                    mLongitude = location.getLongitude();
+                    mLatitude = location.getLatitude();
+                    String request = DailyWeatherTask.MAIN_URI + DailyWeatherTask.KEY +
+                            mLatitude + "," + mLongitude + DailyWeatherTask.PARAMETERS;
+                    new DailyWeatherTask().execute(request);
+                    mLocationManager.removeUpdates(this);
                 }
 
                 @Override
@@ -119,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
 
                 }
             };
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                     100, 0, listener);
 
         } catch (SecurityException ignore) {
@@ -170,6 +154,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                 try {
                     List<DailyWeather> weather = WeatherUtilites.getDailyWeather(result);
                     mAdapter.setData(weather);
+                    final WeatherFragment mainFragment = new WeatherFragment();
+                    final Bundle args = new Bundle();
+                    args.putDouble(LATITUDE_KEY, mLatitude);
+                    args.putDouble(LONGITUDE_KEY, mLongitude);
+                    args.putString(WEATHER_KEY, result);
+                    mainFragment.setArguments(args);
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.main_weather_container, mainFragment)
+                            .commit();
                 } catch (JSONException e) {
                     Log.e(TAG, "Json parsing failed");
                     e.printStackTrace();

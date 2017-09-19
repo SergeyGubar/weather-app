@@ -25,6 +25,7 @@ import okhttp3.Response;
 
 import static com.example.sergey.weatherapp.main.MainActivity.LATITUDE_KEY;
 import static com.example.sergey.weatherapp.main.MainActivity.LONGITUDE_KEY;
+import static com.example.sergey.weatherapp.main.MainActivity.WEATHER_KEY;
 
 
 /**
@@ -33,7 +34,7 @@ import static com.example.sergey.weatherapp.main.MainActivity.LONGITUDE_KEY;
 
 public class WeatherFragment extends Fragment {
 
-    private static final String TAG = "WeatherFragment";
+    private static final String TAG = WeatherFragment.class.getSimpleName();
     private TextView mTemperatureTextView;
     private TextView mCityTextView;
     private TextView mSummaryTextView;
@@ -46,67 +47,31 @@ public class WeatherFragment extends Fragment {
         View inflatedView = inflater.inflate(R.layout.main_weather_fragment, null, isAttachedToParent);
 
         Bundle args = getArguments();
-        double latitude = args.getDouble(LATITUDE_KEY);
-        double longitude = args.getDouble(LONGITUDE_KEY);
+        String weatherData  = args.getString(WEATHER_KEY);
 
         mTemperatureTextView = (TextView) inflatedView.findViewById(R.id.degrees_text_view);
         mCityTextView = (TextView) inflatedView.findViewById(R.id.city_text_view);
         mSummaryTextView = (TextView) inflatedView.findViewById(R.id.weather_description_text_view);
         mWeatherImageView = (ImageView) inflatedView.findViewById(R.id.weather_image_view);
+        setWeather(weatherData);
 
-        new CurrentWeatherTask().execute(CurrentWeatherTask.MAIN_URI + CurrentWeatherTask.KEY +
-                latitude + "," + longitude + CurrentWeatherTask.PARAMETERS);
         return inflatedView;
     }
 
-    private void setWeather(CurrentWeather weather) {
-        mTemperatureTextView.setText(weather.getTemperature());
-        mSummaryTextView.setText(weather.getSummary());
-        int icon = WeatherUtilites.getWeatherIcon(weather.getIcon());
-        mWeatherImageView.setImageResource(icon);
-        mCityTextView.setText("Now, " + "Kharkiv");
-    }
-
-
-    public class CurrentWeatherTask extends AsyncTask<String, Void, String> {
-        private OkHttpClient mClient;
-        private final String TAG = CurrentWeatherTask.class.getSimpleName();
-        public static final String MAIN_URI = "https://api.darksky.net/forecast/";
-        public static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
-        public static final String PARAMETERS = "?exclude=hourly,minutely/";
-
-        @Override
-        protected String doInBackground(String... params) {
-            String queryUrl = params[0];
-            mClient = new OkHttpClient();
-            Request request = new Request.Builder()
-                    .url(queryUrl)
-                    .build();
-
-            Response response;
-            try {
-                response = mClient.newCall(request).execute();
-                return response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null && !result.isEmpty()) {
-                try {
-                    CurrentWeather weather = WeatherUtilites.getCurrentWeather(result);
-                    setWeather(weather);
-                } catch (JSONException e) {
-                    Log.e(TAG, "Json parsing failed");
-                    e.printStackTrace();
-                }
-            } else {
-                Log.e(TAG, "Result is empty or null");
-            }
+    private void setWeather(String jsonWeatherResponse) {
+        CurrentWeather weather;
+        try {
+            weather = WeatherUtilites.getCurrentWeather(jsonWeatherResponse);
+            mTemperatureTextView.setText(weather.getTemperature());
+            mSummaryTextView.setText(weather.getSummary());
+            int icon = WeatherUtilites.getWeatherIcon(weather.getIcon());
+            mWeatherImageView.setImageResource(icon);
+            mCityTextView.setText("Now, " + "Kharkiv");
+        } catch (JSONException e) {
+            Log.e(TAG, "Json parse failed!");
+            e.printStackTrace();
         }
     }
+
 
 }

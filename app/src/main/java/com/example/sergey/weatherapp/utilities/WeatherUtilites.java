@@ -81,6 +81,7 @@ public class WeatherUtilites {
         return result;
     }
 
+    //Awful stuff. Enums incoming
     public static int getWeatherIcon(String iconName) {
         switch (iconName) {
             case "clear-day":
