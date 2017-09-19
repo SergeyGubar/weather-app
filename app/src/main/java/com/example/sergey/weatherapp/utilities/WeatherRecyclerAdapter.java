@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -68,7 +70,10 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherRecycler
 
         public void setWeatherData(DailyWeather weather) {
             String summary = weather.getSummary();
-            String temperature = weather.getMinTemperature() + " - " + weather.getMaxTemperature() + "°C" ;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE");
+
+            String temperature = (weather.getMinTemperature() + " - " + weather.getMaxTemperature()
+                    + "°C \n" + simpleDateFormat.format(weather.getTime()));
             String icon = weather.getIcon();
             mSummary.setText(summary);
             mTemperature.setText(temperature);

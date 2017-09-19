@@ -74,8 +74,7 @@ public class WeatherUtilites {
             double humidity = Double.valueOf(parsedHumidity);
 
             double pressure = Double.valueOf(parsedPressure);
-            //FIXME: Temp
-            weatherToAdd = new DailyWeather(date, parsedSummary, parsedIconType, 0, humidity,
+            weatherToAdd = new DailyWeather(date, parsedSummary, parsedIconType, maxTemp - minTemp, humidity,
                     pressure, maxTemp, minTemp);
             result.add(weatherToAdd);
         }

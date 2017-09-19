@@ -64,7 +64,7 @@ public class WeatherFragment extends Fragment {
         mSummaryTextView.setText(weather.getSummary());
         int icon = WeatherUtilites.getWeatherIcon(weather.getIcon());
         mWeatherImageView.setImageResource(icon);
-        mCityTextView.setText("Kharkiv");
+        mCityTextView.setText("Now, " + "Kharkiv");
     }
 
 
