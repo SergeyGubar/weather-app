@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <fragment
-        android:name="com.example.sergey.weatherapp.fragments.WeatherFragment"
+    android:weightSum="4"
+    android:orientation="vertical"
+    >
+    <FrameLayout
         android:id="@+id/main_weather_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="@dimen/padding_16_dp"
-        tools:layout="@layout/main_weather_fragment" />
-
+        android:layout_weight="0.7"
+        android:paddingStart="22dp"
+        />
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/words_recycler_view"
+        android:id="@+id/weather_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3" />
-
+        android:layout_weight="3.3"
+        />
 </LinearLayout>
