@@ -18,10 +18,9 @@ import android.util.Log;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 import com.example.sergey.weatherapp.fragments.WeatherFragment;
+import com.example.sergey.weatherapp.utilities.IOUtilities;
 import com.example.sergey.weatherapp.utilities.WeatherRecyclerAdapter;
 import com.example.sergey.weatherapp.utilities.WeatherUtilites;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
 
@@ -38,20 +37,25 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     private MainActivityPresenter mPresenter;
     private static final int LOCATION_PERMISSION = 123;
     public static final String LATITUDE_KEY = "latitude";
-    public static final String LONGITUDE_KEY = "longtitude";
+    public static final String LONGITUDE_KEY = "longitude";
     public static final String WEATHER_KEY = "weather";
-    private FusedLocationProviderClient mFusedLocationClient;
+    //    private static final String SAVED_RESULT_KEY = "queryResult";
+    private static final String CACHE_FILE_NAME = "weathercache";
+    private static final String IS_RESTORED_KEY = "isRestored";
     private LocationManager mLocationManager;
     private WeatherRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    private double mLongitude;
-    private double mLatitude;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         mPresenter = new MainActivityPresenter(this, this);
         mRecyclerView = (RecyclerView) findViewById(R.id.weather_recycler_view);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
@@ -60,31 +64,57 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mAdapter);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //load fragment with data from cache
+        mPresenter.loadDailyDataFromCache(CACHE_FILE_NAME);
+        final WeatherFragment mainFragment = new WeatherFragment();
+        final Bundle args = new Bundle();
+        args.putString(WEATHER_KEY, IOUtilities.getDataFromCache(CACHE_FILE_NAME, this));
+        mainFragment.setArguments(args);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_weather_container, mainFragment)
+                .commit();
+        Log.d(TAG, "Data restored from the cache");
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        LOCATION_PERMISSION);
+        //if device was rotated or smth - do not load data from the internet, cached data is enough,
+        //but in case of running the activity for the first time - load data
+        if (savedInstanceState == null || !savedInstanceState.containsKey(IS_RESTORED_KEY)) {
+            Log.d(TAG, "Data loaded from the internet");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                            LOCATION_PERMISSION);
+                } else {
+                    inflateFragment();
+                }
             } else {
                 inflateFragment();
             }
-        } else {
-            inflateFragment();
         }
+
+
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState() called with: outState = [" + outState + "]");
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(IS_RESTORED_KEY, true);
+    }
+
 
     public void inflateFragment() {
         try {
             final LocationListener listener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    mLongitude = location.getLongitude();
-                    mLatitude = location.getLatitude();
-                    String request = DailyWeatherTask.MAIN_URI + DailyWeatherTask.KEY +
-                            mLatitude + "," + mLongitude + DailyWeatherTask.PARAMETERS;
-                    new DailyWeatherTask().execute(request);
+                    double mLongitude = location.getLongitude();
+                    ;
+                    double mLatitude = location.getLatitude();
+                    String request = WeatherTask.MAIN_URI + WeatherTask.KEY +
+                            mLatitude + "," + mLongitude + WeatherTask.PARAMETERS;
+                    new WeatherTask().execute(request);
                     mLocationManager.removeUpdates(this);
                 }
 
@@ -122,10 +152,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         }
     }
 
-    //FIXME : 2 ASYNC TASK WTF?
-    public class DailyWeatherTask extends AsyncTask<String, Void, String> {
+    @Override
+    public WeatherRecyclerAdapter getAdapter() {
+        return mAdapter;
+    }
+
+    public class WeatherTask extends AsyncTask<String, Void, String> {
         private OkHttpClient mClient;
-        private final String TAG = DailyWeatherTask.class.getSimpleName();
+        private final String TAG = WeatherTask.class.getSimpleName();
         public static final String MAIN_URI = "https://api.darksky.net/forecast/";
         public static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
         public static final String PARAMETERS = "?exclude=hourly,minutely/";
@@ -152,17 +186,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         protected void onPostExecute(String result) {
             if (result != null && !result.isEmpty()) {
                 try {
+                    IOUtilities.writeToCache(CACHE_FILE_NAME, result, MainActivity.this);
                     List<DailyWeather> weather = WeatherUtilites.getDailyWeather(result);
                     mAdapter.setData(weather);
                     final WeatherFragment mainFragment = new WeatherFragment();
                     final Bundle args = new Bundle();
-                    args.putDouble(LATITUDE_KEY, mLatitude);
-                    args.putDouble(LONGITUDE_KEY, mLongitude);
                     args.putString(WEATHER_KEY, result);
                     mainFragment.setArguments(args);
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.main_weather_container, mainFragment)
+                            .replace(R.id.main_weather_container, mainFragment)
                             .commit();
                 } catch (JSONException e) {
                     Log.e(TAG, "Json parsing failed");
@@ -172,5 +205,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                 Log.e(TAG, "Result is empty or null");
             }
         }
+
+
     }
 }

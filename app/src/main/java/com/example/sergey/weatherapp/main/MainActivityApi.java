@@ -7,5 +7,5 @@ import com.example.sergey.weatherapp.utilities.WeatherRecyclerAdapter;
  */
 
 public interface MainActivityApi {
-
+    public WeatherRecyclerAdapter getAdapter();
 }
