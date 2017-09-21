@@ -18,10 +18,9 @@ import android.util.Log;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 import com.example.sergey.weatherapp.fragments.WeatherFragment;
+import com.example.sergey.weatherapp.utilities.IOUtilities;
 import com.example.sergey.weatherapp.utilities.WeatherRecyclerAdapter;
 import com.example.sergey.weatherapp.utilities.WeatherUtilites;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
 
@@ -38,9 +37,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     private MainActivityPresenter mPresenter;
     private static final int LOCATION_PERMISSION = 123;
     public static final String LATITUDE_KEY = "latitude";
-    public static final String LONGITUDE_KEY = "longtitude";
+    public static final String LONGITUDE_KEY = "longitude";
     public static final String WEATHER_KEY = "weather";
-    private FusedLocationProviderClient mFusedLocationClient;
+    private static final String SAVED_RESULT_KEY = "queryResult";
+    private static final String CACHE_FILE_NAME = "weathercache";
     private LocationManager mLocationManager;
     private WeatherRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
@@ -50,8 +50,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mPresenter = new MainActivityPresenter(this, this);
         mRecyclerView = (RecyclerView) findViewById(R.id.weather_recycler_view);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
@@ -61,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         mRecyclerView.setAdapter(mAdapter);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mPresenter.loadDataFromCache(CACHE_FILE_NAME);
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -75,6 +79,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState() called with: outState = [" + outState + "]");
+        super.onSaveInstanceState(outState);
+    }
+
+
     public void inflateFragment() {
         try {
             final LocationListener listener = new LocationListener() {
@@ -82,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                 public void onLocationChanged(Location location) {
                     mLongitude = location.getLongitude();
                     mLatitude = location.getLatitude();
-                    String request = DailyWeatherTask.MAIN_URI + DailyWeatherTask.KEY +
-                            mLatitude + "," + mLongitude + DailyWeatherTask.PARAMETERS;
-                    new DailyWeatherTask().execute(request);
+                    String request = WeatherTask.MAIN_URI + WeatherTask.KEY +
+                            mLatitude + "," + mLongitude + WeatherTask.PARAMETERS;
+                    new WeatherTask().execute(request);
                     mLocationManager.removeUpdates(this);
                 }
 
@@ -122,10 +133,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         }
     }
 
-    //FIXME : 2 ASYNC TASK WTF?
-    public class DailyWeatherTask extends AsyncTask<String, Void, String> {
+    @Override
+    public WeatherRecyclerAdapter getAdapter() {
+        return mAdapter;
+    }
+
+    public class WeatherTask extends AsyncTask<String, Void, String> {
         private OkHttpClient mClient;
-        private final String TAG = DailyWeatherTask.class.getSimpleName();
+        private final String TAG = WeatherTask.class.getSimpleName();
         public static final String MAIN_URI = "https://api.darksky.net/forecast/";
         public static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
         public static final String PARAMETERS = "?exclude=hourly,minutely/";
@@ -152,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         protected void onPostExecute(String result) {
             if (result != null && !result.isEmpty()) {
                 try {
+                    IOUtilities.writeToCache(CACHE_FILE_NAME, result, MainActivity.this);
                     List<DailyWeather> weather = WeatherUtilites.getDailyWeather(result);
                     mAdapter.setData(weather);
                     final WeatherFragment mainFragment = new WeatherFragment();
@@ -172,5 +188,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                 Log.e(TAG, "Result is empty or null");
             }
         }
+
+
     }
 }
