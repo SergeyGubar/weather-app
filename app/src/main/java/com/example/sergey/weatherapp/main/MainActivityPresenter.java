@@ -25,7 +25,7 @@ public class MainActivityPresenter {
         this.mApi = mApi;
     }
 
-    public void loadDataFromCache(String cacheFileName) {
+    public void loadDailyDataFromCache(String cacheFileName) {
         String cachedData = IOUtilities.getDataFromCache(cacheFileName, mCtx);
         if(cachedData != null) {
             try {
@@ -37,5 +37,7 @@ public class MainActivityPresenter {
             }
         }
     }
+
+
 
 }

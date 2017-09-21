@@ -39,20 +39,22 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     public static final String LATITUDE_KEY = "latitude";
     public static final String LONGITUDE_KEY = "longitude";
     public static final String WEATHER_KEY = "weather";
-    private static final String SAVED_RESULT_KEY = "queryResult";
+    //    private static final String SAVED_RESULT_KEY = "queryResult";
     private static final String CACHE_FILE_NAME = "weathercache";
+    private static final String IS_RESTORED_KEY = "isRestored";
     private LocationManager mLocationManager;
     private WeatherRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    private double mLongitude;
-    private double mLatitude;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         mPresenter = new MainActivityPresenter(this, this);
         mRecyclerView = (RecyclerView) findViewById(R.id.weather_recycler_view);
@@ -62,27 +64,43 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mAdapter);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //load fragment with data from cache
+        mPresenter.loadDailyDataFromCache(CACHE_FILE_NAME);
+        final WeatherFragment mainFragment = new WeatherFragment();
+        final Bundle args = new Bundle();
+        args.putString(WEATHER_KEY, IOUtilities.getDataFromCache(CACHE_FILE_NAME, this));
+        mainFragment.setArguments(args);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_weather_container, mainFragment)
+                .commit();
+        Log.d(TAG, "Data restored from the cache");
 
-        mPresenter.loadDataFromCache(CACHE_FILE_NAME);
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        LOCATION_PERMISSION);
+        //if device was rotated or smth - do not load data from the internet, cached data is enough,
+        //but in case of running the activity for the first time - load data
+        if (savedInstanceState == null || !savedInstanceState.containsKey(IS_RESTORED_KEY)) {
+            Log.d(TAG, "Data loaded from the internet");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                            LOCATION_PERMISSION);
+                } else {
+                    inflateFragment();
+                }
             } else {
                 inflateFragment();
             }
-        } else {
-            inflateFragment();
         }
+
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "onSaveInstanceState() called with: outState = [" + outState + "]");
         super.onSaveInstanceState(outState);
+        outState.putBoolean(IS_RESTORED_KEY, true);
     }
 
 
@@ -91,8 +109,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
             final LocationListener listener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    mLongitude = location.getLongitude();
-                    mLatitude = location.getLatitude();
+                    double mLongitude = location.getLongitude();
+                    ;
+                    double mLatitude = location.getLatitude();
                     String request = WeatherTask.MAIN_URI + WeatherTask.KEY +
                             mLatitude + "," + mLongitude + WeatherTask.PARAMETERS;
                     new WeatherTask().execute(request);
@@ -172,13 +191,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                     mAdapter.setData(weather);
                     final WeatherFragment mainFragment = new WeatherFragment();
                     final Bundle args = new Bundle();
-                    args.putDouble(LATITUDE_KEY, mLatitude);
-                    args.putDouble(LONGITUDE_KEY, mLongitude);
                     args.putString(WEATHER_KEY, result);
                     mainFragment.setArguments(args);
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.main_weather_container, mainFragment)
+                            .replace(R.id.main_weather_container, mainFragment)
                             .commit();
                 } catch (JSONException e) {
                     Log.e(TAG, "Json parsing failed");
