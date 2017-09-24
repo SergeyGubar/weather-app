@@ -18,11 +18,8 @@ import android.util.Log;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 import com.example.sergey.weatherapp.fragments.WeatherFragment;
-import com.example.sergey.weatherapp.utilities.IOUtilities;
+import com.example.sergey.weatherapp.utilities.IOUtils;
 import com.example.sergey.weatherapp.utilities.WeatherRecyclerAdapter;
-import com.example.sergey.weatherapp.utilities.WeatherUtilites;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,10 +33,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     private static final String TAG = MainActivity.class.getSimpleName();
     private MainActivityPresenter mPresenter;
     private static final int LOCATION_PERMISSION = 123;
-    public static final String LATITUDE_KEY = "latitude";
-    public static final String LONGITUDE_KEY = "longitude";
     public static final String WEATHER_KEY = "weather";
-    //    private static final String SAVED_RESULT_KEY = "queryResult";
     private static final String CACHE_FILE_NAME = "weathercache";
     private static final String IS_RESTORED_KEY = "isRestored";
     private LocationManager mLocationManager;
@@ -55,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         setContentView(R.layout.activity_main);
 
 
-
         mPresenter = new MainActivityPresenter(this, this);
         mRecyclerView = (RecyclerView) findViewById(R.id.weather_recycler_view);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
@@ -65,10 +58,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         mRecyclerView.setAdapter(mAdapter);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //load fragment with data from cache
-        mPresenter.loadDailyDataFromCache(CACHE_FILE_NAME);
+        mPresenter.getDailyWeatherFromCache(CACHE_FILE_NAME);
         final WeatherFragment mainFragment = new WeatherFragment();
         final Bundle args = new Bundle();
-        args.putString(WEATHER_KEY, IOUtilities.getDataFromCache(CACHE_FILE_NAME, this));
+        args.putString(WEATHER_KEY, mPresenter.getDataFromCache(CACHE_FILE_NAME));
         mainFragment.setArguments(args);
         getSupportFragmentManager()
                 .beginTransaction()
@@ -185,22 +178,19 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         @Override
         protected void onPostExecute(String result) {
             if (result != null && !result.isEmpty()) {
-                try {
-                    IOUtilities.writeToCache(CACHE_FILE_NAME, result, MainActivity.this);
-                    List<DailyWeather> weather = WeatherUtilites.getDailyWeather(result);
-                    mAdapter.setData(weather);
-                    final WeatherFragment mainFragment = new WeatherFragment();
-                    final Bundle args = new Bundle();
-                    args.putString(WEATHER_KEY, result);
-                    mainFragment.setArguments(args);
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.main_weather_container, mainFragment)
-                            .commit();
-                } catch (JSONException e) {
-                    Log.e(TAG, "Json parsing failed");
-                    e.printStackTrace();
-                }
+
+                mPresenter.writeToCache(CACHE_FILE_NAME, result);
+                List<DailyWeather> weather = mPresenter.getDailyWeatherFromJson(result);
+                mAdapter.setData(weather);
+                final WeatherFragment mainFragment = new WeatherFragment();
+                final Bundle args = new Bundle();
+                args.putString(WEATHER_KEY, result);
+                mainFragment.setArguments(args);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_weather_container, mainFragment)
+                        .commit();
+
             } else {
                 Log.e(TAG, "Result is empty or null");
             }

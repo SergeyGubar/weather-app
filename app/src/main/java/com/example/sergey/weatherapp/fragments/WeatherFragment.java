@@ -1,6 +1,5 @@
 package com.example.sergey.weatherapp.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,18 +12,10 @@ import android.widget.TextView;
 
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.CurrentWeather;
-import com.example.sergey.weatherapp.utilities.WeatherUtilites;
+import com.example.sergey.weatherapp.utilities.WeatherJsonUtils;
 
 import org.json.JSONException;
 
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import static com.example.sergey.weatherapp.main.MainActivity.LATITUDE_KEY;
-import static com.example.sergey.weatherapp.main.MainActivity.LONGITUDE_KEY;
 import static com.example.sergey.weatherapp.main.MainActivity.WEATHER_KEY;
 
 
@@ -61,10 +52,10 @@ public class WeatherFragment extends Fragment {
     private void setWeather(String jsonWeatherResponse) {
         CurrentWeather weather;
         try {
-            weather = WeatherUtilites.getCurrentWeather(jsonWeatherResponse);
+            weather = WeatherJsonUtils.getCurrentWeather(jsonWeatherResponse);
             mTemperatureTextView.setText(weather.getTemperature());
             mSummaryTextView.setText(weather.getSummary());
-            int icon = WeatherUtilites.getWeatherIcon(weather.getIcon());
+            int icon = WeatherJsonUtils.getWeatherIcon(weather.getIcon());
             mWeatherImageView.setImageResource(icon);
             mCityTextView.setText("Now, " + "Kharkiv");
         } catch (JSONException e) {

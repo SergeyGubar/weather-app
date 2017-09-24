@@ -1,9 +1,10 @@
 package com.example.sergey.weatherapp.utilities;
 
+import com.example.sergey.weatherapp.Helpers.ConvertHelper;
+import com.example.sergey.weatherapp.Helpers.WeatherJsonHelper;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.CurrentWeather;
 import com.example.sergey.weatherapp.entities.DailyWeather;
-import com.example.sergey.weatherapp.entities.Weather;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,17 +18,10 @@ import java.util.List;
  * Created by Sergey on 9/14/2017.
  */
 
-public class WeatherUtilites {
-    //This class absolutely breaks Single responsibility principle. That's bad, i know
-    private WeatherUtilites() {
+public class WeatherJsonUtils implements WeatherJsonHelper {
 
-    }
-
-    public static int fahrenheitToCelcius(double fahrenheitDegree) {
-        return (int) ((fahrenheitDegree - 32) / 1.8);
-    }
-
-    public static CurrentWeather getCurrentWeather(String json) throws JSONException {
+    public CurrentWeather getCurrentWeather(String json) throws JSONException {
+        ConvertHelper converter = new DegreeConverter();
         JSONObject jsonObject = new JSONObject(json);
         JSONObject currentWeather = jsonObject.getJSONObject("currently");
 
@@ -40,7 +34,7 @@ public class WeatherUtilites {
         long milliSeconds = Long.valueOf(parsedDate) * 1000;
         Date date = new Date(milliSeconds);
 
-        int temp = WeatherUtilites.fahrenheitToCelcius(Double.valueOf(parsedTemp));
+        int temp = converter.fahrenheitToCelcius(Double.valueOf(parsedTemp));
 
         double humidity = Double.valueOf(parsedHumidity);
 
@@ -50,8 +44,9 @@ public class WeatherUtilites {
         return weather;
     }
 
-    public static List<DailyWeather> getDailyWeather(String json) throws JSONException {
+    public List<DailyWeather> getDailyWeatherFromJson(String json) throws JSONException {
         List<DailyWeather> result = new ArrayList<>();
+        ConvertHelper converter = new DegreeConverter();
         JSONObject mainObj = new JSONObject(json);
         JSONObject dailyObj = mainObj.getJSONObject("daily");
         JSONArray dailyArr = dailyObj.getJSONArray("data");
@@ -68,8 +63,8 @@ public class WeatherUtilites {
             long milliSeconds = Long.valueOf(parsedDate) * 1000;
             Date date = new Date(milliSeconds);
 
-            int minTemp = WeatherUtilites.fahrenheitToCelcius(Double.valueOf(parsedMinTemp));
-            int maxTemp = WeatherUtilites.fahrenheitToCelcius(Double.valueOf(parsedMaxTemp));
+            int minTemp = converter.fahrenheitToCelcius(Double.valueOf(parsedMinTemp));
+            int maxTemp = converter.fahrenheitToCelcius(Double.valueOf(parsedMaxTemp));
 
             double humidity = Double.valueOf(parsedHumidity);
 
@@ -81,26 +76,5 @@ public class WeatherUtilites {
         return result;
     }
 
-    //Awful stuff. Enums incoming
-    public static int getWeatherIcon(String iconName) {
-        switch (iconName) {
-            case "clear-day":
-                return R.drawable.ic_clear_day;
-            case "clear-night":
-                return R.drawable.ic_clear_night;
-            case "rain":
-                return R.drawable.ic_rain;
-            case "snow":
-                return R.drawable.ic_snow;
-            case "sleet":
-                return R.drawable.ic_rain;
-            case "wind":
-                return R.drawable.ic_wind;
-            case "fog":
-                return R.drawable.ic_fog;
-            default:
-                return R.drawable.ic_cloud;
-        }
-    }
 
 }

@@ -1,7 +1,5 @@
 package com.example.sergey.weatherapp.entities;
 
-import com.example.sergey.weatherapp.utilities.WeatherUtilites;
-
 import java.util.Date;
 
 /**
