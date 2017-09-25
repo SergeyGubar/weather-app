@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.CurrentWeather;
+import com.example.sergey.weatherapp.helpers.IconHelper;
+import com.example.sergey.weatherapp.helpers.WeatherJsonHelper;
+import com.example.sergey.weatherapp.utilities.IconUtils;
 import com.example.sergey.weatherapp.utilities.WeatherJsonUtils;
 
 import org.json.JSONException;
@@ -30,7 +33,8 @@ public class WeatherFragment extends Fragment {
     private TextView mCityTextView;
     private TextView mSummaryTextView;
     private ImageView mWeatherImageView;
-
+    private WeatherJsonHelper mJsonHelper;
+    private IconHelper mIconHelper;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,6 +48,8 @@ public class WeatherFragment extends Fragment {
         mCityTextView = (TextView) inflatedView.findViewById(R.id.city_text_view);
         mSummaryTextView = (TextView) inflatedView.findViewById(R.id.weather_description_text_view);
         mWeatherImageView = (ImageView) inflatedView.findViewById(R.id.weather_image_view);
+        mJsonHelper = new WeatherJsonUtils();
+        mIconHelper = new IconUtils();
         setWeather(weatherData);
 
         return inflatedView;
@@ -52,10 +58,10 @@ public class WeatherFragment extends Fragment {
     private void setWeather(String jsonWeatherResponse) {
         CurrentWeather weather;
         try {
-            weather = WeatherJsonUtils.getCurrentWeather(jsonWeatherResponse);
+            weather = mJsonHelper.getCurrentWeatherFromJson(jsonWeatherResponse);
             mTemperatureTextView.setText(weather.getTemperature());
             mSummaryTextView.setText(weather.getSummary());
-            int icon = WeatherJsonUtils.getWeatherIcon(weather.getIcon());
+            int icon = mIconHelper.getWeatherIcon(weather.getIcon());
             mWeatherImageView.setImageResource(icon);
             mCityTextView.setText("Now, " + "Kharkiv");
         } catch (JSONException e) {

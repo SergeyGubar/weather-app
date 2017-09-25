@@ -3,7 +3,7 @@ package com.example.sergey.weatherapp.utilities;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.sergey.weatherapp.Helpers.IOHelper;
+import com.example.sergey.weatherapp.helpers.IOHelper;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

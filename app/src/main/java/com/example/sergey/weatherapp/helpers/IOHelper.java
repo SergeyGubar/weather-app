@@ -1,4 +1,4 @@
-package com.example.sergey.weatherapp.Helpers;
+package com.example.sergey.weatherapp.helpers;
 
 import android.content.Context;
 

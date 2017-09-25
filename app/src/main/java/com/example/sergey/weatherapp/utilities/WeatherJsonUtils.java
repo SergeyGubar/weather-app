@@ -1,8 +1,7 @@
 package com.example.sergey.weatherapp.utilities;
 
-import com.example.sergey.weatherapp.Helpers.ConvertHelper;
-import com.example.sergey.weatherapp.Helpers.WeatherJsonHelper;
-import com.example.sergey.weatherapp.R;
+import com.example.sergey.weatherapp.helpers.ConvertHelper;
+import com.example.sergey.weatherapp.helpers.WeatherJsonHelper;
 import com.example.sergey.weatherapp.entities.CurrentWeather;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 
@@ -20,7 +19,7 @@ import java.util.List;
 
 public class WeatherJsonUtils implements WeatherJsonHelper {
 
-    public CurrentWeather getCurrentWeather(String json) throws JSONException {
+    public CurrentWeather getCurrentWeatherFromJson(String json) throws JSONException {
         ConvertHelper converter = new DegreeConverter();
         JSONObject jsonObject = new JSONObject(json);
         JSONObject currentWeather = jsonObject.getJSONObject("currently");

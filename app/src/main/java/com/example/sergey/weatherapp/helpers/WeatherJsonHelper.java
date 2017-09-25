@@ -1,4 +1,4 @@
-package com.example.sergey.weatherapp.Helpers;
+package com.example.sergey.weatherapp.helpers;
 
 import com.example.sergey.weatherapp.entities.CurrentWeather;
 import com.example.sergey.weatherapp.entities.DailyWeather;
@@ -12,6 +12,6 @@ import java.util.List;
  */
 
 public interface WeatherJsonHelper {
-    CurrentWeather getCurrentWeather(String json) throws JSONException;
+    CurrentWeather getCurrentWeatherFromJson(String json) throws JSONException;
     List<DailyWeather> getDailyWeatherFromJson(String json) throws JSONException;
 }

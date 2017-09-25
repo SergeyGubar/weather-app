@@ -3,8 +3,8 @@ package com.example.sergey.weatherapp.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.sergey.weatherapp.Helpers.IOHelper;
-import com.example.sergey.weatherapp.Helpers.WeatherJsonHelper;
+import com.example.sergey.weatherapp.helpers.IOHelper;
+import com.example.sergey.weatherapp.helpers.WeatherJsonHelper;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 import com.example.sergey.weatherapp.utilities.IOUtils;
 import com.example.sergey.weatherapp.utilities.WeatherJsonUtils;
@@ -63,6 +63,5 @@ public class MainActivityPresenter {
         }
         return result;
     }
-
 
 }

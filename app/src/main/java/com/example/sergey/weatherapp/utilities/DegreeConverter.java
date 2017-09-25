@@ -1,6 +1,6 @@
 package com.example.sergey.weatherapp.utilities;
 
-import com.example.sergey.weatherapp.Helpers.ConvertHelper;
+import com.example.sergey.weatherapp.helpers.ConvertHelper;
 
 /**
  * Created by Sergey on 9/24/2017.
