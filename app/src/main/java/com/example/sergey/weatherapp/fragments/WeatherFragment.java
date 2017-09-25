@@ -1,6 +1,5 @@
 package com.example.sergey.weatherapp.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,18 +12,13 @@ import android.widget.TextView;
 
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.CurrentWeather;
-import com.example.sergey.weatherapp.utilities.WeatherUtilites;
+import com.example.sergey.weatherapp.helpers.IconHelper;
+import com.example.sergey.weatherapp.helpers.WeatherJsonHelper;
+import com.example.sergey.weatherapp.utilities.IconUtils;
+import com.example.sergey.weatherapp.utilities.WeatherJsonUtils;
 
 import org.json.JSONException;
 
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import static com.example.sergey.weatherapp.main.MainActivity.LATITUDE_KEY;
-import static com.example.sergey.weatherapp.main.MainActivity.LONGITUDE_KEY;
 import static com.example.sergey.weatherapp.main.MainActivity.WEATHER_KEY;
 
 
@@ -39,7 +33,8 @@ public class WeatherFragment extends Fragment {
     private TextView mCityTextView;
     private TextView mSummaryTextView;
     private ImageView mWeatherImageView;
-
+    private WeatherJsonHelper mJsonHelper;
+    private IconHelper mIconHelper;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -53,6 +48,8 @@ public class WeatherFragment extends Fragment {
         mCityTextView = (TextView) inflatedView.findViewById(R.id.city_text_view);
         mSummaryTextView = (TextView) inflatedView.findViewById(R.id.weather_description_text_view);
         mWeatherImageView = (ImageView) inflatedView.findViewById(R.id.weather_image_view);
+        mJsonHelper = new WeatherJsonUtils();
+        mIconHelper = new IconUtils();
         setWeather(weatherData);
 
         return inflatedView;
@@ -61,10 +58,10 @@ public class WeatherFragment extends Fragment {
     private void setWeather(String jsonWeatherResponse) {
         CurrentWeather weather;
         try {
-            weather = WeatherUtilites.getCurrentWeather(jsonWeatherResponse);
+            weather = mJsonHelper.getCurrentWeatherFromJson(jsonWeatherResponse);
             mTemperatureTextView.setText(weather.getTemperature());
             mSummaryTextView.setText(weather.getSummary());
-            int icon = WeatherUtilites.getWeatherIcon(weather.getIcon());
+            int icon = mIconHelper.getWeatherIcon(weather.getIcon());
             mWeatherImageView.setImageResource(icon);
             mCityTextView.setText("Now, " + "Kharkiv");
         } catch (JSONException e) {
