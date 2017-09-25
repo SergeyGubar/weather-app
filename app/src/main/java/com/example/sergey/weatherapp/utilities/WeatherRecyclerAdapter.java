@@ -8,11 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.sergey.weatherapp.helpers.IconHelper;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -59,13 +59,14 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherRecycler
         private ImageView mIcon;
         private TextView mTemperature;
         private TextView mSummary;
-
+        private IconHelper mIconHelper;
 
         public WeatherViewHolder(View itemView) {
             super(itemView);
             mIcon = (ImageView) itemView.findViewById(R.id.item_image_view);
             mTemperature = (TextView) itemView.findViewById(R.id.item_temperature_text_view);
             mSummary = (TextView) itemView.findViewById(R.id.item_description_tex_view);
+            mIconHelper = new IconUtils();
         }
 
         public void setWeatherData(DailyWeather weather) {
@@ -77,7 +78,7 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherRecycler
             String icon = weather.getIcon();
             mSummary.setText(summary);
             mTemperature.setText(temperature);
-            int iconRes = WeatherUtilites.getWeatherIcon(icon);
+            int iconRes = mIconHelper.getWeatherIcon(icon);
             mIcon.setImageResource(iconRes);
 
         }

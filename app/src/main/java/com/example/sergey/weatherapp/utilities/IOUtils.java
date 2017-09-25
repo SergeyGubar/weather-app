@@ -3,9 +3,10 @@ package com.example.sergey.weatherapp.utilities;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.sergey.weatherapp.helpers.IOHelper;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,11 +17,11 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by Sergey on 9/21/2017.
  */
 
-public class IOUtilities {
+public class IOUtils implements IOHelper {
 
-    private static final String TAG = IOUtilities.class.getSimpleName();
+    private static final String TAG = IOUtils.class.getSimpleName();
 
-    public static void writeToCache(String fileName, String data, Context ctx) {
+    public void writeToCache(String fileName, String data, Context ctx) {
         try {
             FileOutputStream fileOutputStream = ctx.openFileOutput(fileName, MODE_PRIVATE);
             fileOutputStream.write(data.getBytes());
@@ -31,7 +32,7 @@ public class IOUtilities {
         }
     }
 
-    public static String getDataFromCache(String fileName, Context ctx) {
+    public String getDataFromCache(String fileName, Context ctx) {
 
         try (FileInputStream fileInputStream = ctx.openFileInput(fileName)) {
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
