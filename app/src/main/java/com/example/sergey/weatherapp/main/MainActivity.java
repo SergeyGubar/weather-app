@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.example.sergey.weatherapp.R;
@@ -29,9 +30,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements MainActivityApi {
-
     private static final String TAG = MainActivity.class.getSimpleName();
-    private MainActivityPresenter mPresenter;
     private static final int LOCATION_PERMISSION = 123;
     public static final String WEATHER_KEY = "weather";
     private static final String CACHE_FILE_NAME = "weathercache";
@@ -39,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
     private LocationManager mLocationManager;
     private WeatherRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private Toolbar mToolbar;
+    private MainActivityPresenter mPresenter;
 
 
     @Override
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
 
         mPresenter = new MainActivityPresenter(this, this);
         mRecyclerView = (RecyclerView) findViewById(R.id.weather_recycler_view);
+        mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(mToolbar);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
                 false);
         mAdapter = new WeatherRecyclerAdapter(this);
@@ -103,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                 @Override
                 public void onLocationChanged(Location location) {
                     double mLongitude = location.getLongitude();
-                    ;
                     double mLatitude = location.getLatitude();
                     String request = WeatherTask.MAIN_URI + WeatherTask.KEY +
                             mLatitude + "," + mLongitude + WeatherTask.PARAMETERS;
@@ -150,12 +152,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         return mAdapter;
     }
 
-    public class WeatherTask extends AsyncTask<String, Void, String> {
-        private OkHttpClient mClient;
+    private class WeatherTask extends AsyncTask<String, Void, String> {
         private final String TAG = WeatherTask.class.getSimpleName();
-        public static final String MAIN_URI = "https://api.darksky.net/forecast/";
-        public static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
-        public static final String PARAMETERS = "?exclude=hourly,minutely/";
+        static final String MAIN_URI = "https://api.darksky.net/forecast/";
+        static final String KEY = "5b0ccf2ae41ee32686d2ae27eff06011/";
+        static final String PARAMETERS = "?exclude=hourly,minutely/";
+        private OkHttpClient mClient;
 
         @Override
         protected String doInBackground(String... params) {
@@ -178,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         @Override
         protected void onPostExecute(String result) {
             if (result != null && !result.isEmpty()) {
-
                 mPresenter.writeToCache(CACHE_FILE_NAME, result);
                 List<DailyWeather> weather = mPresenter.getDailyWeatherFromJson(result);
                 mAdapter.setData(weather);
@@ -190,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
                         .beginTransaction()
                         .replace(R.id.main_weather_container, mainFragment)
                         .commit();
-
             } else {
                 Log.e(TAG, "Result is empty or null");
             }
