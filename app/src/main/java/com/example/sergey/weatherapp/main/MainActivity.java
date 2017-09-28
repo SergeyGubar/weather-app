@@ -1,6 +1,7 @@
 package com.example.sergey.weatherapp.main;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,10 +16,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
 import com.example.sergey.weatherapp.fragments.WeatherFragment;
+import com.example.sergey.weatherapp.settings.SettingsActivity;
 import com.example.sergey.weatherapp.utilities.IOUtils;
 import com.example.sergey.weatherapp.utilities.WeatherRecyclerAdapter;
 
@@ -133,6 +137,25 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
 
         } catch (SecurityException ignore) {
             //permission anyway was given, idk why we should wrap it into try/catch
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+            case R.id.settings_menu_item:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return false;
         }
     }
 
