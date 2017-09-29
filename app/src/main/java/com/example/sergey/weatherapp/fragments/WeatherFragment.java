@@ -35,6 +35,7 @@ public class WeatherFragment extends Fragment {
     private ImageView mWeatherImageView;
     private WeatherJsonHelper mJsonHelper;
     private IconHelper mIconHelper;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class WeatherFragment extends Fragment {
             mSummaryTextView.setText(weather.getSummary());
             int icon = mIconHelper.getWeatherIcon(weather.getIcon());
             mWeatherImageView.setImageResource(icon);
-            mCityTextView.setText("Now, " + "Kharkiv");
+            mCityTextView.setText("Now: ");
         } catch (JSONException e) {
             Log.e(TAG, "Json parse failed!");
             e.printStackTrace();
