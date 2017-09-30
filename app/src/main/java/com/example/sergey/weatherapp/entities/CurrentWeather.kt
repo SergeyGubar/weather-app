@@ -8,5 +8,5 @@ import java.util.*
 class CurrentWeather(time: Date, summary: String, _temperature : Int,
                           humidity: Double,  pressure: Double,  icon : String) : Weather(time, summary,
         icon, _temperature, humidity, pressure) {
-    val temperature : String get() = getTemperature().toString() + "°C"
+    val temperature : String get() = getTemperature().toString()
 }

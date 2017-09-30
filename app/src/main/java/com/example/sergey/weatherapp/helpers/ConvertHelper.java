@@ -5,6 +5,6 @@ package com.example.sergey.weatherapp.helpers;
  */
 
 public interface ConvertHelper {
-    public int fahrenheitToCelcius(double fahrenheitDegree);
+    public int fahrenheitToCelsius(double fahrenheitDegree);
 
 }

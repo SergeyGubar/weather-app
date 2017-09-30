@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.sergey.weatherapp.contracts.SharedPrefContract;
 import com.example.sergey.weatherapp.helpers.IconHelper;
 import com.example.sergey.weatherapp.R;
 import com.example.sergey.weatherapp.entities.DailyWeather;
+import com.example.sergey.weatherapp.helpers.SharedPrefHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -23,14 +25,12 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherRecycler
 
     private Context mCtx;
     private List<DailyWeather> mWeatherList;
+    private SharedPrefHelper mPrefHelper;
+
 
     public WeatherRecyclerAdapter(Context ctx) {
-        mCtx = ctx;
-    }
-
-    public WeatherRecyclerAdapter(Context ctx, List<DailyWeather> weatherList) {
         this.mCtx = ctx;
-        this.mWeatherList = weatherList;
+        this.mPrefHelper = new SharedPrefUtils(ctx);
     }
 
     @Override
@@ -72,10 +72,12 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherRecycler
         public void setWeatherData(DailyWeather weather) {
             String summary = weather.getSummary();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE");
-
+            String degreeSign = mPrefHelper.getDegreeSign();
             String temperature = (weather.getMinTemperature() + " - " + weather.getMaxTemperature()
-                    + "°C \n" + simpleDateFormat.format(weather.getTime()));
+                    + degreeSign + " \n" + simpleDateFormat.format(weather.getTime()));
             String icon = weather.getIcon();
+
+
             mSummary.setText(summary);
             mTemperature.setText(temperature);
             int iconRes = mIconHelper.getWeatherIcon(icon);

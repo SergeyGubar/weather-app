@@ -29,6 +29,7 @@ public class IconUtils implements IconHelper {
         hash.put("sleet", R.drawable.ic_rain);
         hash.put("wind", R.drawable.ic_wind);
         hash.put("fog", R.drawable.ic_fog);
+        hash.put("cloudy", R.drawable.ic_cloud);
         return hash;
     }
 
