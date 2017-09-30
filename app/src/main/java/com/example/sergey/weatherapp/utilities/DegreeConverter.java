@@ -8,7 +8,7 @@ import com.example.sergey.weatherapp.helpers.ConvertHelper;
 
 public class DegreeConverter implements ConvertHelper {
     @Override
-    public int fahrenheitToCelcius(double fahrenheitDegree) {
+    public int fahrenheitToCelsius(double fahrenheitDegree) {
         return (int) ((fahrenheitDegree - 32) / 1.8);
     }
 }

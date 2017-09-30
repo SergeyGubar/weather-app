@@ -29,7 +29,7 @@ public class MainActivityPresenter {
         this.mCtx = mCtx;
         this.mApi = mApi;
         mIoHelper = new IOUtils();
-        mJsonHelper = new WeatherJsonUtils();
+        mJsonHelper = new WeatherJsonUtils(mCtx);
     }
 
     public void getDailyWeatherFromCache(String cacheFileName) {
