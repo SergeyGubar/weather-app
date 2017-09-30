@@ -5,4 +5,6 @@ package com.example.sergey.weatherapp.helpers;
  */
 
 public interface SharedPrefHelper {
+    String getDegreeUnits();
+    String getDegreeSign();
 }

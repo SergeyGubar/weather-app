@@ -5,4 +5,7 @@ package com.example.sergey.weatherapp.contracts;
  */
 
 public class SharedPrefContract {
+    public static final String UNITS_KEY = "unit_preference";
+    public static final String CELCIUS = "celsius";
+    public static final String FAHRENHEIT = "fahrenheit";
 }
