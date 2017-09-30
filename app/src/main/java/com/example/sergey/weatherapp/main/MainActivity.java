@@ -65,15 +65,22 @@ public class MainActivity extends AppCompatActivity implements MainActivityApi {
         mRecyclerView.setAdapter(mAdapter);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //load fragment with data from cache
+
         mPresenter.getDailyWeatherFromCache(CACHE_FILE_NAME);
-        final WeatherFragment mainFragment = new WeatherFragment();
-        final Bundle args = new Bundle();
-        args.putString(WEATHER_KEY, mPresenter.getDataFromCache(CACHE_FILE_NAME));
-        mainFragment.setArguments(args);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.main_weather_container, mainFragment)
-                .commit();
+        String fullCachedData = mPresenter.getDataFromCache(CACHE_FILE_NAME);
+        if(fullCachedData != null) {
+            final WeatherFragment mainFragment = new WeatherFragment();
+            final Bundle args = new Bundle();
+            args.putString(WEATHER_KEY, mPresenter.getDataFromCache(CACHE_FILE_NAME));
+
+            mainFragment.setArguments(args);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.main_weather_container, mainFragment)
+                    .commit();
+        }
+
+
         Log.d(TAG, "Data restored from the cache");
 
         //if device was rotated or smth - do not load data from the internet, cached data is enough,

@@ -65,7 +65,7 @@ public class WeatherFragment extends Fragment {
             weather = mJsonHelper.getCurrentWeatherFromJson(jsonWeatherResponse);
             mTemperatureTextView.setText(weather.getTemperature() + mPrefHelper.getDegreeSign());
             mSummaryTextView.setText(weather.getSummary());
-            int icon = mIconHelper.getWeatherIcon(weather.getIcon());
+            int icon = mIconHelper.getWeatherIcon(weather.  getIcon());
             mWeatherImageView.setImageResource(icon);
             mCityTextView.setText("Now: ");
         } catch (JSONException e) {
