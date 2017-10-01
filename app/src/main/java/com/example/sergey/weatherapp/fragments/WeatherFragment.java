@@ -1,5 +1,6 @@
 package com.example.sergey.weatherapp.fragments;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -42,7 +43,14 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         boolean isAttachedToParent = false;
-        View inflatedView = inflater.inflate(R.layout.main_weather_fragment, null, isAttachedToParent);
+        View inflatedView;
+        int orientation = getResources().getConfiguration().orientation;
+
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            inflatedView= inflater.inflate(R.layout.main_weather_fragment_vertical, null, isAttachedToParent);
+        } else {
+            inflatedView= inflater.inflate(R.layout.main_weather_fragment_horizontal, null, isAttachedToParent);
+        }
 
         Bundle args = getArguments();
         String weatherData  = args.getString(WEATHER_KEY);
